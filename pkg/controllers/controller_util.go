@@ -22,7 +22,7 @@ import (
 	"reflect"
 
 	"k8s.io/apimachinery/pkg/api/equality"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
@@ -33,7 +33,7 @@ import (
 func CreateIfNotExists(ctx context.Context, c client.Client, obj client.Object, f controllerutil.MutateFn) (controllerutil.OperationResult, error) {
 	key := client.ObjectKeyFromObject(obj)
 	if err := c.Get(ctx, key, obj); err != nil {
-		if !apierrors.IsNotFound(err) {
+		if !errors.IsNotFound(err) {
 			return controllerutil.OperationResultNone, err
 		}
 		if err := mutate(f, key, obj); err != nil {
@@ -52,7 +52,7 @@ func CreateIfNotExists(ctx context.Context, c client.Client, obj client.Object, 
 func UpdateIfExists(ctx context.Context, c client.Client, obj client.Object, f controllerutil.MutateFn) (controllerutil.OperationResult, error) {
 	key := client.ObjectKeyFromObject(obj)
 	if err := c.Get(ctx, key, obj); err != nil {
-		if apierrors.IsNotFound(err) {
+		if errors.IsNotFound(err) {
 			return controllerutil.OperationResultNone, nil
 		}
 		return controllerutil.OperationResultNone, err
@@ -78,7 +78,7 @@ func UpdateIfExists(ctx context.Context, c client.Client, obj client.Object, f c
 func PatchIfExists(ctx context.Context, c client.Client, obj client.Object, f controllerutil.MutateFn) (controllerutil.OperationResult, error) {
 	key := client.ObjectKeyFromObject(obj)
 	if err := c.Get(ctx, key, obj); err != nil {
-		if apierrors.IsNotFound(err) {
+		if errors.IsNotFound(err) {
 			return controllerutil.OperationResultNone, nil
 		}
 		return controllerutil.OperationResultNone, err
