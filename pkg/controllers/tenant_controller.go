@@ -36,7 +36,6 @@ import (
 	"github.com/k8s-cloud-platform/trident/pkg/apis"
 	"github.com/k8s-cloud-platform/trident/pkg/apis/v1alpha1"
 	"github.com/k8s-cloud-platform/trident/pkg/conditions"
-	util "github.com/k8s-cloud-platform/trident/pkg/controllerutil"
 )
 
 const (
@@ -73,7 +72,7 @@ func (c *TenantController) Reconcile(ctx context.Context, req reconcile.Request)
 	defer func() {
 		c.reconcilePhase(tenant)
 		runtimeObj := tenant.DeepCopy()
-		_, err := util.PatchIfExists(ctx, c.Client, runtimeObj, func() error {
+		_, err := PatchIfExists(ctx, c.Client, runtimeObj, func() error {
 			runtimeObj.ObjectMeta.Finalizers = tenant.ObjectMeta.Finalizers
 			runtimeObj.ObjectMeta.OwnerReferences = tenant.ObjectMeta.OwnerReferences
 			runtimeObj.Status.Phase = tenant.Status.Phase
@@ -128,7 +127,7 @@ func (c *TenantController) reconcileNormal(ctx context.Context, tenant *v1alpha1
 			},
 		},
 	}
-	if _, err := util.CreateIfNotExists(ctx, c.Client, ns, func() error {
+	if _, err := CreateIfNotExists(ctx, c.Client, ns, func() error {
 		return nil
 	}); err != nil {
 		klog.ErrorS(err, "unable to create or update namespace")

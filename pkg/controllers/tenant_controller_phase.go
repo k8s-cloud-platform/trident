@@ -36,7 +36,6 @@ import (
 
 	"github.com/k8s-cloud-platform/trident/pkg/apis"
 	v1alpha12 "github.com/k8s-cloud-platform/trident/pkg/apis/v1alpha1"
-	"github.com/k8s-cloud-platform/trident/pkg/controllerutil"
 	"github.com/k8s-cloud-platform/trident/pkg/kubeconfig"
 	"github.com/k8s-cloud-platform/trident/pkg/secret"
 )
@@ -74,7 +73,7 @@ func (c *TenantController) reconcileSecret(ctx context.Context, tenant *v1alpha1
 			Name:      "server-cert",
 		},
 	}
-	if _, err := controllerutil.CreateIfNotExists(ctx, c.Client, secretObj, func() error {
+	if _, err := CreateIfNotExists(ctx, c.Client, secretObj, func() error {
 		// server ca
 		serverCA, serverCAKey, err := secret.NewCA(nil)
 		if err != nil {
@@ -186,7 +185,7 @@ func (c *TenantController) reconcileKubeConfig(ctx context.Context, tenant *v1al
 			Name:      "kubeconfig-admin",
 		},
 	}
-	if _, err := controllerutil.CreateIfNotExists(ctx, c.Client, secretObj, func() error {
+	if _, err := CreateIfNotExists(ctx, c.Client, secretObj, func() error {
 		caCert, caKey, err := c.parseCASecret(ctx, tenant.ClusterNamespaceInHost(), "server-cert")
 		if err != nil {
 			klog.ErrorS(err, "unable to parse ca secret")
@@ -238,7 +237,7 @@ func (c *TenantController) reconcileKubeConfig(ctx context.Context, tenant *v1al
 			Name:      "kubeconfig-controller-manager",
 		},
 	}
-	if _, err := controllerutil.CreateIfNotExists(ctx, c.Client, secretObj, func() error {
+	if _, err := CreateIfNotExists(ctx, c.Client, secretObj, func() error {
 		caCert, caKey, err := c.parseCASecret(ctx, tenant.ClusterNamespaceInHost(), "server-cert")
 		if err != nil {
 			klog.ErrorS(err, "unable to parse ca secret")
@@ -293,7 +292,7 @@ func (c *TenantController) reconcileAPIServer(ctx context.Context, tenant *v1alp
 			Name:      "kube-apiserver",
 		},
 	}
-	if _, err := controllerutil.CreateIfNotExists(ctx, c.Client, deployment, func() error {
+	if _, err := CreateIfNotExists(ctx, c.Client, deployment, func() error {
 		deployment.ObjectMeta.OwnerReferences = []metav1.OwnerReference{
 			{
 				APIVersion: tenant.APIVersion,
@@ -433,7 +432,7 @@ func (c *TenantController) reconcileAPIServer(ctx context.Context, tenant *v1alp
 			Name:      "kube-apiserver",
 		},
 	}
-	if _, err := controllerutil.CreateIfNotExists(ctx, c.Client, service, func() error {
+	if _, err := CreateIfNotExists(ctx, c.Client, service, func() error {
 		service.ObjectMeta.OwnerReferences = []metav1.OwnerReference{
 			{
 				APIVersion: tenant.APIVersion,
@@ -472,7 +471,7 @@ func (c *TenantController) reconcileControllerManager(ctx context.Context, tenan
 			Name:      "kube-controller-manager",
 		},
 	}
-	if _, err := controllerutil.CreateIfNotExists(ctx, c.Client, deployment, func() error {
+	if _, err := CreateIfNotExists(ctx, c.Client, deployment, func() error {
 		deployment.ObjectMeta.OwnerReferences = []metav1.OwnerReference{
 			{
 				APIVersion: tenant.APIVersion,
