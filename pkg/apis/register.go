@@ -14,16 +14,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package v1alpha1
+package apis
 
-type TenantPhase string
-
+// GroupName is the group name used in this package
 const (
-	TenantPhasePending      TenantPhase = "Pending"
-	TenantPhaseProvisioning TenantPhase = "Provisioning"
-	TenantPhaseProvisioned  TenantPhase = "Provisioned"
-	TenantPhaseReady        TenantPhase = "Ready"
-	TenantPhaseFailed       TenantPhase = "Failed"
-	TenantPhaseTerminating  TenantPhase = "Terminating"
-	TenantPhaseUnknown      TenantPhase = "Unknown"
+	GroupName = "trident.kcp.io"
 )

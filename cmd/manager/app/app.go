@@ -36,7 +36,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller"
 
 	"github.com/k8s-cloud-platform/trident/cmd/manager/app/options"
-	"github.com/k8s-cloud-platform/trident/pkg/apis/tenancy/v1alpha1"
+	"github.com/k8s-cloud-platform/trident/pkg/apis/v1alpha1"
 	"github.com/k8s-cloud-platform/trident/pkg/controllers"
 )
 
@@ -56,7 +56,7 @@ func NewControllerManagerCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:  "manager",
-		Long: `KCP manager for multi-tenants.`,
+		Long: `KCP manager for trident.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := opts.Log.ValidateAndApply(); err != nil {
 				return err

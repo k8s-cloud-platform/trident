@@ -14,9 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package cluster
+package apis
 
-// GroupName is the group name used in this package
+type TenantConditionType string
+
 const (
-	GroupName = "cluster.kcp.io"
+	TenantConditionProvisioned = "Provisioned"
+	TenantConditionReady       = "Ready"
 )

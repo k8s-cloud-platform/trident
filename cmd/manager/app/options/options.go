@@ -27,10 +27,23 @@ import (
 	"k8s.io/component-base/logs"
 )
 
+const (
+	leaderElect                  = true
+	leaderElectResourceNamespace = "default"
+	leaderElectResourceName      = "manager.trident.kcp.io"
+	leaderElectLeaseDuration     = 15 * time.Second
+	leaderElectRenewDeadline     = 10 * time.Second
+	leaderElectRetryPeriod       = 3 * time.Second
+
+	ConcurrencyTenantSync  = 10
+	ConcurrencyClusterSync = 10
+)
+
 type Options struct {
-	EtcdServers           string
-	EtcdSecret            string
-	ConcurrencyTenantSync int
+	EtcdServers            string
+	EtcdSecret             string
+	ConcurrencyTenantSync  int
+	ConcurrencyClusterSync int
 
 	Log            *logs.Options
 	LeaderElection *componentbaseconfig.LeaderElectionConfiguration
@@ -55,20 +68,22 @@ func (o *Options) AddFlags(flags *pflag.FlagSet) {
 	flags.StringVar(&o.EtcdSecret, "etcd-secret", "",
 		"Reference of etcd secret, use [namespace]/[name] or [name](use default namespace).")
 
-	flags.IntVar(&o.ConcurrencyTenantSync, "concurrency-tenant-sync", 10,
+	flags.IntVar(&o.ConcurrencyTenantSync, "concurrency-tenant-sync", ConcurrencyTenantSync,
 		"Concurrency of tenant controllers to sync.")
+	flags.IntVar(&o.ConcurrencyClusterSync, "concurrency-cluster-sync", ConcurrencyClusterSync,
+		"Concurrency of cluster controllers to sync.")
 
-	flags.BoolVar(&o.LeaderElection.LeaderElect, "leader-elect", true,
+	flags.BoolVar(&o.LeaderElection.LeaderElect, "leader-elect", leaderElect,
 		"Enable leader elect.")
-	flags.StringVar(&o.LeaderElection.ResourceNamespace, "leader-elect-resource-namespace", "default",
+	flags.StringVar(&o.LeaderElection.ResourceNamespace, "leader-elect-resource-namespace", leaderElectResourceNamespace,
 		"Namespace of leader elect resource.")
-	flags.StringVar(&o.LeaderElection.ResourceName, "leader-elect-resource-name", "manager.multi-tenants.kcp.io",
+	flags.StringVar(&o.LeaderElection.ResourceName, "leader-elect-resource-name", leaderElectResourceName,
 		"Name of leader elect resource.")
-	flags.DurationVar(&o.LeaderElection.LeaseDuration.Duration, "leader-elect-lease-duration", 15*time.Second,
+	flags.DurationVar(&o.LeaderElection.LeaseDuration.Duration, "leader-elect-lease-duration", leaderElectLeaseDuration,
 		"Duration of leader elect lease.")
-	flags.DurationVar(&o.LeaderElection.RenewDeadline.Duration, "leader-elect-renew-deadline", 10*time.Second,
+	flags.DurationVar(&o.LeaderElection.RenewDeadline.Duration, "leader-elect-renew-deadline", leaderElectRenewDeadline,
 		"Duration of leader elect renew deadline.")
-	flags.DurationVar(&o.LeaderElection.RetryPeriod.Duration, "leader-elect-retry-period", 3*time.Second,
+	flags.DurationVar(&o.LeaderElection.RetryPeriod.Duration, "leader-elect-retry-period", leaderElectRetryPeriod,
 		"Duration of leader elect retry period.")
 }
 
@@ -85,6 +100,13 @@ func (o *Options) Validate() field.ErrorList {
 	}
 	if o.LeaderElection.RetryPeriod.Duration <= 0 {
 		errs = append(errs, field.Required(newPath.Child("LeaderElection.RetryPeriod.Duration"), "must bigger than 0"))
+	}
+
+	if o.ConcurrencyClusterSync <= 0 {
+		errs = append(errs, field.Required(newPath.Child("Concurrey.Cluster.Sync"), "must bigger than 0"))
+	}
+	if o.ConcurrencyTenantSync <= 0 {
+		errs = append(errs, field.Required(newPath.Child("Concurrey.Tenant.Sync"), "must bigger than 0"))
 	}
 
 	if o.EtcdServers == "" {

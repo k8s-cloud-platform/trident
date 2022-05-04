@@ -18,6 +18,8 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
+	"github.com/k8s-cloud-platform/trident/pkg/apis"
 )
 
 // +genclient
@@ -58,11 +60,11 @@ type TenantStatus struct {
 	Conditions []metav1.Condition `json:"conditions,omitempty"`
 }
 
-func (t *TenantStatus) IsPhase(p TenantPhase) bool {
+func (t *TenantStatus) IsPhase(p apis.TenantPhase) bool {
 	return t.Phase == string(p)
 }
 
-func (t *TenantStatus) SetPhase(p TenantPhase) {
+func (t *TenantStatus) SetPhase(p apis.TenantPhase) {
 	t.Phase = string(p)
 }
 

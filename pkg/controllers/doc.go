@@ -16,6 +16,6 @@ limitations under the License.
 
 // +kubebuilder:rbac:groups="",resources=events,verbs=create
 // +kubebuilder:rbac:groups=coordination.k8s.io,resources=leases,verbs=get;create
-// +kubebuilder:rbac:groups=tenancy.kcp.io,resources=tenants;tenants/status,verbs=get;list;watch;create;update;patch
+// +kubebuilder:rbac:groups=trident.kcp.io,resources=tenants;tenants/status,verbs=get;list;watch;create;update;patch
 
 package controllers

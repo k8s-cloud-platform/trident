@@ -34,39 +34,40 @@ import (
 	"k8s.io/klog/v2"
 	"k8s.io/utils/pointer"
 
-	"github.com/k8s-cloud-platform/trident/pkg/apis/tenancy/v1alpha1"
+	"github.com/k8s-cloud-platform/trident/pkg/apis"
+	v1alpha12 "github.com/k8s-cloud-platform/trident/pkg/apis/v1alpha1"
 	"github.com/k8s-cloud-platform/trident/pkg/controllerutil"
 	"github.com/k8s-cloud-platform/trident/pkg/kubeconfig"
 	"github.com/k8s-cloud-platform/trident/pkg/secret"
 )
 
-func (c *TenantController) reconcilePhase(tenant *v1alpha1.Tenant) {
+func (c *TenantController) reconcilePhase(tenant *v1alpha12.Tenant) {
 	if tenant.Status.Phase == "" {
-		tenant.Status.SetPhase(v1alpha1.TenantPhasePending)
+		tenant.Status.SetPhase(apis.TenantPhasePending)
 	}
 
-	if meta.IsStatusConditionFalse(tenant.Status.Conditions, v1alpha1.TenantConditionProvisioned) {
-		tenant.Status.SetPhase(v1alpha1.TenantPhaseProvisioning)
+	if meta.IsStatusConditionFalse(tenant.Status.Conditions, apis.TenantConditionProvisioned) {
+		tenant.Status.SetPhase(apis.TenantPhaseProvisioning)
 	}
 
-	if meta.IsStatusConditionTrue(tenant.Status.Conditions, v1alpha1.TenantConditionProvisioned) {
-		tenant.Status.SetPhase(v1alpha1.TenantPhaseProvisioned)
+	if meta.IsStatusConditionTrue(tenant.Status.Conditions, apis.TenantConditionProvisioned) {
+		tenant.Status.SetPhase(apis.TenantPhaseProvisioned)
 	}
 
-	if meta.IsStatusConditionFalse(tenant.Status.Conditions, v1alpha1.TenantConditionReady) {
-		tenant.Status.SetPhase(v1alpha1.TenantPhaseFailed)
+	if meta.IsStatusConditionFalse(tenant.Status.Conditions, apis.TenantConditionReady) {
+		tenant.Status.SetPhase(apis.TenantPhaseFailed)
 	}
 
-	if meta.IsStatusConditionTrue(tenant.Status.Conditions, v1alpha1.TenantConditionReady) {
-		tenant.Status.SetPhase(v1alpha1.TenantPhaseReady)
+	if meta.IsStatusConditionTrue(tenant.Status.Conditions, apis.TenantConditionReady) {
+		tenant.Status.SetPhase(apis.TenantPhaseReady)
 	}
 
 	if !tenant.DeletionTimestamp.IsZero() {
-		tenant.Status.SetPhase(v1alpha1.TenantPhaseTerminating)
+		tenant.Status.SetPhase(apis.TenantPhaseTerminating)
 	}
 }
 
-func (c *TenantController) reconcileSecret(ctx context.Context, tenant *v1alpha1.Tenant) error {
+func (c *TenantController) reconcileSecret(ctx context.Context, tenant *v1alpha12.Tenant) error {
 	secretObj := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tenant.ClusterNamespaceInHost(),
@@ -178,7 +179,7 @@ func (c *TenantController) reconcileSecret(ctx context.Context, tenant *v1alpha1
 	return nil
 }
 
-func (c *TenantController) reconcileKubeConfig(ctx context.Context, tenant *v1alpha1.Tenant) error {
+func (c *TenantController) reconcileKubeConfig(ctx context.Context, tenant *v1alpha12.Tenant) error {
 	secretObj := &corev1.Secret{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tenant.ClusterNamespaceInHost(),
@@ -285,7 +286,7 @@ func (c *TenantController) reconcileKubeConfig(ctx context.Context, tenant *v1al
 	return nil
 }
 
-func (c *TenantController) reconcileAPIServer(ctx context.Context, tenant *v1alpha1.Tenant) error {
+func (c *TenantController) reconcileAPIServer(ctx context.Context, tenant *v1alpha12.Tenant) error {
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tenant.ClusterNamespaceInHost(),
@@ -464,7 +465,7 @@ func (c *TenantController) reconcileAPIServer(ctx context.Context, tenant *v1alp
 	return nil
 }
 
-func (c *TenantController) reconcileControllerManager(ctx context.Context, tenant *v1alpha1.Tenant) error {
+func (c *TenantController) reconcileControllerManager(ctx context.Context, tenant *v1alpha12.Tenant) error {
 	deployment := &appsv1.Deployment{
 		ObjectMeta: metav1.ObjectMeta{
 			Namespace: tenant.ClusterNamespaceInHost(),

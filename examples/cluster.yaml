@@ -1,4 +1,4 @@
-apiVersion: cluster.kcp.io/v1alpha1
+apiVersion: trident.kcp.io/v1alpha1
 kind: Cluster
 metadata:
   name: test1

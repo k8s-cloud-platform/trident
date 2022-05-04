@@ -21,12 +21,12 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	"github.com/k8s-cloud-platform/trident/pkg/apis/tenancy"
+	"github.com/k8s-cloud-platform/trident/pkg/apis"
 )
 
 var (
 	// SchemeGroupVersion is group version used to register these objects
-	SchemeGroupVersion = schema.GroupVersion{Group: tenancy.GroupName, Version: "v1alpha1"}
+	SchemeGroupVersion = schema.GroupVersion{Group: apis.GroupName, Version: "v1alpha1"}
 
 	// SchemeBuilder initializes a scheme builder
 	SchemeBuilder = runtime.NewSchemeBuilder(addKnownTypes)
@@ -39,6 +39,8 @@ func addKnownTypes(scheme *runtime.Scheme) error {
 	scheme.AddKnownTypes(SchemeGroupVersion,
 		&Tenant{},
 		&TenantList{},
+		&Cluster{},
+		&ClusterList{},
 	)
 	metav1.AddToGroupVersion(scheme, SchemeGroupVersion)
 	return nil

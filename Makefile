@@ -86,7 +86,7 @@ generate-manifests: $(CONTROLLER_GEN) ## Generate manifests e.g. CRD, RBAC etc.
 	$(CONTROLLER_GEN) \
 		paths=./... \
 		crd:crdVersions=v1 \
-		rbac:roleName=manager \
+		rbac:roleName=trident-manager \
 		output:crd:dir=deploy/crd \
 		output:rbac:dir=deploy/rbac
 

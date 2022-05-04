@@ -14,9 +14,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-package tenancy
+package apis
 
-// GroupName is the group name used in this package
+type TenantPhase string
+
 const (
-	GroupName = "tenancy.kcp.io"
+	TenantPhasePending      TenantPhase = "Pending"
+	TenantPhaseProvisioning TenantPhase = "Provisioning"
+	TenantPhaseProvisioned  TenantPhase = "Provisioned"
+	TenantPhaseReady        TenantPhase = "Ready"
+	TenantPhaseFailed       TenantPhase = "Failed"
+	TenantPhaseTerminating  TenantPhase = "Terminating"
+	TenantPhaseUnknown      TenantPhase = "Unknown"
 )

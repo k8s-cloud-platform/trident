@@ -33,13 +33,14 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 	"sigs.k8s.io/controller-runtime/pkg/reconcile"
 
-	"github.com/k8s-cloud-platform/trident/pkg/apis/tenancy/v1alpha1"
+	"github.com/k8s-cloud-platform/trident/pkg/apis"
+	"github.com/k8s-cloud-platform/trident/pkg/apis/v1alpha1"
 	"github.com/k8s-cloud-platform/trident/pkg/conditions"
 	util "github.com/k8s-cloud-platform/trident/pkg/controllerutil"
 )
 
 const (
-	tenantFinalizer = "tenancy.kcp.io/tenants"
+	tenantFinalizer = "trident.kcp.io/tenants"
 )
 
 type TenantController struct {
@@ -100,7 +101,7 @@ func (c *TenantController) Reconcile(ctx context.Context, req reconcile.Request)
 func (c *TenantController) reconcileDelete(ctx context.Context, tenant *v1alpha1.Tenant) (reconcile.Result, error) {
 	klog.V(1).InfoS("reconcile for Tenant delete", "name", tenant.Name)
 
-	if !tenant.Status.IsPhase(v1alpha1.TenantPhaseTerminating) {
+	if !tenant.Status.IsPhase(apis.TenantPhaseTerminating) {
 		// wait for phase to be terminating
 		return reconcile.Result{}, nil
 	}
@@ -134,8 +135,8 @@ func (c *TenantController) reconcileNormal(ctx context.Context, tenant *v1alpha1
 		return reconcile.Result{}, err
 	}
 
-	if !conditions.Has(tenant, v1alpha1.TenantConditionProvisioned) ||
-		conditions.IsFalse(tenant, v1alpha1.TenantConditionProvisioned) {
+	if !conditions.Has(tenant, apis.TenantConditionProvisioned) ||
+		conditions.IsFalse(tenant, apis.TenantConditionProvisioned) {
 		// handle for provisioning
 		phases := []func(context.Context, *v1alpha1.Tenant) error{
 			c.reconcileSecret,
@@ -148,12 +149,12 @@ func (c *TenantController) reconcileNormal(ctx context.Context, tenant *v1alpha1
 			err := fun(ctx, tenant)
 			if err != nil {
 				klog.ErrorS(err, "unable to handle for phase")
-				conditions.MarkFalse(tenant, v1alpha1.TenantConditionProvisioned, "Failed", "Failed to handle phase")
+				conditions.MarkFalse(tenant, apis.TenantConditionProvisioned, "Failed", "Failed to handle phase")
 				return reconcile.Result{}, err
 			}
 		}
 
-		conditions.MarkTrue(tenant, v1alpha1.TenantConditionProvisioned, "Success", "Success to provision")
+		conditions.MarkTrue(tenant, apis.TenantConditionProvisioned, "Success", "Success to provision")
 	}
 
 	// check if ready
@@ -184,6 +185,6 @@ func (c *TenantController) reconcileNormal(ctx context.Context, tenant *v1alpha1
 		return result, nil
 	}
 
-	conditions.MarkTrue(tenant, v1alpha1.TenantConditionReady, "Success", "Ready")
+	conditions.MarkTrue(tenant, apis.TenantConditionReady, "Success", "Ready")
 	return reconcile.Result{}, nil
 }
