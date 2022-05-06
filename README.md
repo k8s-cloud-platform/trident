@@ -6,6 +6,12 @@
 
 
 
+## Architecture
+
+![architecture](docs/images/architecture.png)
+
+
+
 ## Concepts
 
 - Tenant: 租户，分为若隔离租户、强隔离租户
