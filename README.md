@@ -14,5 +14,5 @@
 
 ## Concepts
 
-- Tenant: 租户，分为若隔离租户、强隔离租户
+- Tenant: 租户，分为弱隔离租户、强隔离租户
 - Cluster: 资源集群，分为VK、OCM类型集群
