@@ -24,20 +24,14 @@ import (
 	"github.com/spf13/cobra"
 	appsv1 "k8s.io/api/apps/v1"
 	corev1 "k8s.io/api/core/v1"
-	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/types"
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
-	"k8s.io/client-go/tools/cache"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"sigs.k8s.io/controller-runtime/pkg/client"
-	"sigs.k8s.io/controller-runtime/pkg/controller"
 
-	"github.com/k8s-cloud-platform/trident/cmd/manager/app/options"
+	"github.com/k8s-cloud-platform/trident/cmd/scheduler/app/options"
 	"github.com/k8s-cloud-platform/trident/pkg/apis/v1alpha1"
-	"github.com/k8s-cloud-platform/trident/pkg/controllers"
 )
 
 var (
@@ -50,13 +44,13 @@ func init() {
 	utilruntime.Must(v1alpha1.AddToScheme(scheme))
 }
 
-// NewManagerCommand creates a *cobra.Command object with default parameters
-func NewManagerCommand() *cobra.Command {
+// NewSchedulerCommand creates a *cobra.Command object with default parameters
+func NewSchedulerCommand() *cobra.Command {
 	opts := options.NewOptions()
 
 	cmd := &cobra.Command{
-		Use:  "manager",
-		Long: `KCP manager for trident.`,
+		Use:  "scheduler",
+		Long: `KCP scheduler for trident.`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			if err := opts.Log.ValidateAndApply(); err != nil {
 				return err
@@ -94,51 +88,15 @@ func run(ctx context.Context, opts *options.Options) error {
 		LeaseDuration:                 &opts.LeaderElection.LeaseDuration.Duration,
 		RenewDeadline:                 &opts.LeaderElection.RenewDeadline.Duration,
 		RetryPeriod:                   &opts.LeaderElection.RetryPeriod.Duration,
-		ClientDisableCacheFor: []client.Object{
-			&corev1.Secret{},
-			&appsv1.Deployment{},
-		},
 	})
 	if err != nil {
 		klog.ErrorS(err, "unable to start manager")
 		return err
 	}
 
-	namespace, name, err := cache.SplitMetaNamespaceKey(opts.EtcdSecret)
-	if err != nil {
-		klog.ErrorS(err, "unable to split etcd-secret")
-		return err
-	}
-	if namespace == "" {
-		namespace = "default"
-	}
-	etcdSecret := &corev1.Secret{}
-	if err := mgr.GetClient().Get(ctx, types.NamespacedName{
-		Namespace: namespace,
-		Name:      name,
-	}, etcdSecret); err != nil {
-		if apierrors.IsNotFound(err) {
-			klog.ErrorS(err, "secret[etcd-secret] not exists")
-			return err
-		}
-		klog.ErrorS(err, "unable to get secret for etcd-secret")
-		return err
-	}
-
-	if err = (&controllers.TenantController{
-		EtcdSecret:  etcdSecret.Data,
-		EtcdServers: opts.EtcdServers,
-		Client:      mgr.GetClient(),
-	}).SetupWithManager(mgr, controller.Options{
-		MaxConcurrentReconciles: opts.ConcurrencyTenantSync,
-	}); err != nil {
-		klog.ErrorS(err, "unable to create tenant controller")
-		return err
-	}
-
-	klog.Info("starting manager")
+	klog.Info("starting scheduler")
 	if err := mgr.Start(ctx); err != nil {
-		klog.ErrorS(err, "unable to run manager")
+		klog.ErrorS(err, "unable to run scheduler")
 		return err
 	}
 

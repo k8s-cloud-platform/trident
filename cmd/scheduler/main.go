@@ -21,11 +21,11 @@ import (
 
 	"k8s.io/component-base/cli"
 
-	"github.com/k8s-cloud-platform/trident/cmd/manager/app"
+	"github.com/k8s-cloud-platform/trident/cmd/scheduler/app"
 )
 
 func main() {
-	command := app.NewManagerCommand()
+	command := app.NewSchedulerCommand()
 	code := cli.Run(command)
 	os.Exit(code)
 }
