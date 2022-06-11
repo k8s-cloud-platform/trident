@@ -31,6 +31,7 @@ import (
 	"k8s.io/client-go/tools/cache"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
+	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/controller"
@@ -94,6 +95,7 @@ func run(ctx context.Context, opts *options.Options) error {
 		LeaseDuration:                 &opts.LeaderElection.LeaseDuration.Duration,
 		RenewDeadline:                 &opts.LeaderElection.RenewDeadline.Duration,
 		RetryPeriod:                   &opts.LeaderElection.RetryPeriod.Duration,
+		SyncPeriod:                    pointer.Duration(0),
 		ClientDisableCacheFor: []client.Object{
 			&corev1.Secret{},
 			&appsv1.Deployment{},

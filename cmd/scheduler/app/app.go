@@ -28,6 +28,7 @@ import (
 	utilruntime "k8s.io/apimachinery/pkg/util/runtime"
 	cliflag "k8s.io/component-base/cli/flag"
 	"k8s.io/klog/v2"
+	"k8s.io/utils/pointer"
 	ctrl "sigs.k8s.io/controller-runtime"
 
 	"github.com/k8s-cloud-platform/trident/cmd/scheduler/app/options"
@@ -88,6 +89,7 @@ func run(ctx context.Context, opts *options.Options) error {
 		LeaseDuration:                 &opts.LeaderElection.LeaseDuration.Duration,
 		RenewDeadline:                 &opts.LeaderElection.RenewDeadline.Duration,
 		RetryPeriod:                   &opts.LeaderElection.RetryPeriod.Duration,
+		SyncPeriod:                    pointer.Duration(0),
 	})
 	if err != nil {
 		klog.ErrorS(err, "unable to start manager")

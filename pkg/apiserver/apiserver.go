@@ -63,6 +63,7 @@ func (server *Server) Run(ctx context.Context) error {
 	//	Scheme:                 scheme,
 	//	MetricsBindAddress:     "0",
 	//	HealthProbeBindAddress: "0",
+	//  SyncPeriod:             pointer.Duration(0),
 	//})
 	//if err != nil {
 	//	klog.ErrorS(err, "unable to start apiserver")
